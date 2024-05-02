@@ -2,139 +2,154 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+// Inclusão de bibliotecas necessárias.
 
 using std::string;
 using std::vector;
 using std::remove_if; 
+// Declaração do uso do namespace std para evitar repetição do prefixo std::.
 
 using std::cout;
 using std::cin;
 using std::endl;
+// Declaração do uso específico dos objetos cout, cin e endl do namespace std.
 
 class Autor{
-    string nome;
+    string nome; // Nome do autor.
 
     public:
+        Autor(const string n):nome(n){}; // Construtor que inicializa o nome do autor.
+        ~Autor(){}; // Destrutor padrão.
+        string get_nome(){return nome;}; // Método para retornar o nome do autor.
+        void set_nome(const string n){nome = n;}; // Método para definir o nome do autor.
 
-        Autor(const string n):nome(n){};
-        ~Autor(){};
-        string get_nome(){return nome;};
-        void set_nome(const string n){nome = n;};
-
-        void print_info(){
+        void print_info(){ // Método para imprimir as informações do autor.
             cout<<"Autor : "<<nome<<" ;"<<endl;
         }
 };
 
 class Livro{
-    string titulo;
-    vector<Autor*> autores;
-    int n_paginas;
+    string titulo; // Título do livro.
+    vector<Autor*> autores; // Vetor de ponteiros para autores associados ao livro.
+    int n_paginas; // Número de páginas do livro.
 
     public: 
+    Livro(const string t, int p):titulo(t), n_paginas(p){}; // Construtor que inicializa o título e número de páginas do livro.
+    ~Livro(){
+        // Desalocando a memória manualmente
+        for (Autor* ptr : autores) {
+            delete ptr;
+        }
 
-    Livro(const string t, int p):titulo(t), n_paginas(p){};
-    ~Livro(){};
+        // Limpando o vetor
+        autores.clear();
 
-    string get_titulo(){return titulo;};
-    void set_titulo(const string n){titulo = n;};
-    int get_n_paginas(){return n_paginas;};
-    void set_n_paginas(const int n){n_paginas = n;};
+    }; // Destrutor padrão.
 
-    void print_info(){
-            cout<<"Livro : "<<titulo<<" ;"<<endl;
-            cout<<"Autores : "<<endl;
-            for(Autor* aut : autores){
-                aut->print_info();
+    string get_titulo(){return titulo;}; // Método para retornar o título do livro.
+    void set_titulo(const string n){titulo = n;}; // Método para definir o título do livro.
+    int get_n_paginas(){return n_paginas;}; // Método para retornar o número de páginas do livro.
+    void set_n_paginas(const int n){n_paginas = n;}; // Método para definir o número de páginas do livro.
+
+    void print_info(){ // Método para imprimir as informações do livro.
+            cout<<"Livro : "<<titulo<<" ;"<<endl; // Imprime o título do livro.
+            cout<<"Autores : "<<endl; // Imprime os autores associados ao livro.
+            for(Autor* aut : autores){ // Percorre o vetor de autores.
+                aut->print_info(); // Imprime as informações de cada autor.
             }
-            cout<<"Numero de Paginas: "<<n_paginas<<endl;
-            tipo();
+            cout<<"Numero de Paginas: "<<n_paginas<<endl; // Imprime o número de páginas do livro.
+            tipo(); // Chama o método tipo() da classe Livro.
         }
     
-    vector<Autor*> get_autores(){return autores;};
+    vector<Autor*> get_autores(){return autores;}; // Método para retornar o vetor de autores associados ao livro.
 
-    void operator+(Autor& aut){
-        autores.push_back(&aut);
+    void operator+(Autor& aut){ // Sobrecarga do operador + para adicionar um autor ao livro.
+        autores.push_back(&aut); // Adiciona um ponteiro para o autor ao vetor de autores do livro.
     };
-    void operator-(Autor& aut){
-        autores.erase(std::remove(autores.begin(), autores.end(), &aut), autores.end());
+    void operator-(Autor& aut){ // Sobrecarga do operador - para remover um autor do livro.
+        autores.erase(std::remove(autores.begin(), autores.end(), &aut), autores.end()); // Remove o autor do vetor de autores do livro.
     };
 
-    virtual void tipo() = 0;
+    virtual void tipo() = 0; // Método virtual puro para definir o tipo do livro.
 };
 
-class LivroFisico:public Livro{
-    string tipo_papel;
+class LivroFisico:public Livro{ // Classe derivada de Livro para representar um livro físico.
+    string tipo_papel; // Tipo de papel do livro físico.
 
     public:
+    LivroFisico(const string t, int p, string tipo):Livro(t,p),tipo_papel(tipo){}; // Construtor que inicializa o título, número de páginas e tipo de papel do livro físico.
 
-    LivroFisico(const string t, int p, string tipo):Livro(t,p),tipo_papel(tipo){};
-
-    void tipo(){cout<<"Tipo: FISICO;"<<endl<<"Tipo de papel: "<<tipo_papel<<";"<<endl;}
+    void tipo(){cout<<"Tipo: FISICO;"<<endl<<"Tipo de papel: "<<tipo_papel<<";"<<endl;} // Implementação do método tipo() para livros físicos.
     
 };
 
-class LivroDigital:public Livro{
-    string tipo_documento;
+class LivroDigital:public Livro{ // Classe derivada de Livro para representar um livro digital.
+    string tipo_documento; // Tipo de documento do livro digital.
 
     public:
+    LivroDigital(const string t, int p, string tipo):Livro(t,p),tipo_documento(tipo){}; // Construtor que inicializa o título, número de páginas e tipo de documento do livro digital.
 
-    LivroDigital(const string t, int p, string tipo):Livro(t,p),tipo_documento(tipo){};
-
-    void tipo(){cout<<"Tipo: DIGITAL;"<<endl<<"Formato: "<<tipo_documento<<";"<<endl;}
+    void tipo(){cout<<"Tipo: DIGITAL;"<<endl<<"Formato: "<<tipo_documento<<";"<<endl;} // Implementação do método tipo() para livros digitais.
     
 };
 
 class Biblioteca{
-    vector<Livro*> livros;
+    vector<Livro*> livros; // Vetor de ponteiros para livros na biblioteca.
     
     public:
+    Biblioteca(){}; // Construtor padrão.
+    ~Biblioteca(){
+                // Desalocando a memória manualmente
+                for (Livro* ptr : livros) {
+                    delete ptr;
+                }
 
-    Biblioteca(){};
-    ~Biblioteca(){};
+                // Limpando o vetor
+                livros.clear();
+    }; // Destrutor padrão.
 
-    void adicionar_livro(Livro* l){livros.push_back(l);};
-    void remover_livro(Livro* l){ livros.erase(std::remove(livros.begin(), livros.end(), l), livros.end());};
-    void remover_livro(const string& tituloLivro) {
-        auto it = std::find_if(livros.begin(), livros.end(), [&](Livro* l) { return l->get_titulo() == tituloLivro; });
+    void adicionar_livro(Livro* l){livros.push_back(l);}; // Método para adicionar um livro à biblioteca.
+    void remover_livro(Livro* l){ livros.erase(std::remove(livros.begin(), livros.end(), l), livros.end());}; // Método para remover um livro da biblioteca.
+    void remover_livro(const string& tituloLivro) { // Método para remover um livro da biblioteca pelo título.
+        auto it = std::find_if(livros.begin(), livros.end(), [&](Livro* l) { return l->get_titulo() == tituloLivro; }); // Procura o livro pelo título.
 
-        if (it != livros.end()) {
-            delete *it; // Liberar a memória alocada para o livro
-            livros.erase(it); // Remover o livro da lista
-            cout << "Livro removido com sucesso!" << endl;
-        } else {
-            cout << "Livro nao encontrado na biblioteca." << endl;
+        if (it != livros.end()) { // Se o livro for encontrado.
+            delete *it; // Libera a memória alocada para o livro.
+            livros.erase(it); // Remove o livro do vetor.
+            cout << "Livro removido com sucesso!" << endl; // Informa que o livro foi removido com sucesso.
+        } else { // Se o livro não for encontrado.
+            cout << "Livro nao encontrado na biblioteca." << endl; // Informa que o livro não foi encontrado na biblioteca.
         }
     }
-    void print_info(){
-            cout<<"Livros : "<<endl;
-            for(Livro* l : livros){
-                l->print_info();
-                cout<<endl;
+    void print_info(){ // Método para imprimir as informações dos livros na biblioteca.
+            cout<<"Livros : "<<endl; // Imprime a lista de livros na biblioteca.
+            for(Livro* l : livros){ // Percorre o vetor de livros.
+                l->print_info(); // Imprime as informações de cada livro.
+                cout<<endl; // Adiciona uma linha em branco entre os livros.
             }
         }
     
-    void operator+(Livro& book){
-        adicionar_livro(&book);
+    void operator+(Livro& book){ // Sobrecarga do operador + para adicionar um livro à biblioteca.
+        adicionar_livro(&book); // Chama o método adicionar_livro() para adicionar o livro à biblioteca.
     };
-    void operator-(Livro& book){
-        remover_livro(&book);    
+    void operator-(Livro& book){ // Sobrecarga do operador - para remover um livro da biblioteca.
+        remover_livro(&book); // Chama o método remover_livro() para remover o livro da biblioteca.
     };
 };
 
-void exibir_menu() {
-    cout<<endl;
-    cout << "MENU Biblioteca:" << endl;
-    cout << "1. Criar Livro" << endl;
-    cout << "2. Excluir Livro" << endl;
-    cout << "3. Criar Autor" << endl;
-    cout << "4. Excluir Autor" << endl;
-    cout << "5. Adicionar Autor ao Livro" << endl;
-    cout << "6. Adicionar Livro à Biblioteca" << endl;
-    cout << "7. Remover Livro da Biblioteca" << endl;
-    cout << "8. Lista Livros na Biblioteca" << endl;
-    cout << "0. Sair" << endl;
-    cout<<endl;
+void exibir_menu() { // Função para exibir o menu da biblioteca.
+    cout<<endl; // Adiciona uma linha em branco antes do menu.
+    cout << "MENU Biblioteca:" << endl; // Imprime o título do menu.
+    cout << "1. Criar Livro" << endl; // Opção para criar um livro.
+    cout << "2. Excluir Livro" << endl; // Opção para excluir um livro.
+    cout << "3. Criar Autor" << endl; // Opção para criar um autor.
+    cout << "4. Excluir Autor" << endl; // Opção para excluir um autor.
+    cout << "5. Adicionar Autor ao Livro" << endl; // Opção para adicionar um autor a um livro.
+    cout << "6. Adicionar Livro à Biblioteca" << endl; // Opção para adicionar um livro à biblioteca.
+    cout << "7. Remover Livro da Biblioteca" << endl; // Opção para remover um livro da biblioteca.
+    cout << "8. Lista Livros na Biblioteca" << endl; // Opção para listar os livros na biblioteca.
+    cout << "0. Sair" << endl; // Opção para sair do programa.
+    cout<<endl; // Adiciona uma linha em branco após o menu.
 };
 
 
